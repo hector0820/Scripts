@@ -1,0 +1,12 @@
+#!/bin/bash
+# hectorhernandez.xyz
+
+dir=".local/share/busquedas/historial"
+busqueda=$(echo -e "Buscar en el explorador\nDescargar Playlist" | dmenu -p "¿Qué quieres buscar? " -i -l 5)
+
+if [ "$busqueda" != "Buscar en el explorador" ]
+then
+	YTplaylist
+else
+	busquedasYT_browser
+fi

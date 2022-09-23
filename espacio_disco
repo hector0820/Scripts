@@ -1,0 +1,3 @@
+#!/bin/bash
+usado=`df -h /dev/sda2 | awk '{print $5}' | sed -n 2p`
+echo "💾${usado}"

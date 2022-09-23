@@ -1,0 +1,48 @@
+#!/bin/bash
+
+if [ "$(ls ~/Xiaomi)" ]
+then
+	 notify-send "🌝 Hola hacker 🕵️‍♂️" "A magia vai acontecer 💾"
+
+	 [ -d ~/Telefono ] || mkdir ~/Telefono
+	 for i in {Pdf,Images,Videos}; do [ -d "~/Telefono/$i"] || mkdir ~/Telefono/$i; done
+
+	 cd Xiaomi
+	 tree -i -f -o ~/lista.txt
+
+	 # Imagenes
+	 for i in {jpg,jpeg,png}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
+
+	 while IFS= read -r line
+	 do
+	         [ -f "${line}" ] && cp -v "$line" ~/Telefono/Images
+	 done < ~/temp
+
+	 rm ~/temp
+
+
+	 # Videos
+	 for i in {webm,mp4}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
+
+	 while IFS= read -r line
+	 do
+		 [ -f "${line}" ] && cp -v "$line" ~/Telefono/Videos
+	 done < ~/temp
+
+	 rm ~/temp
+
+
+	 # Documentos
+	 for i in {pdf,epub,docx}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
+
+	 while IFS= read -r line
+	 do
+		 [ -f "${line}" ] && cp -v "$line" ~/Telefono/Pdf
+	 done < ~/temp
+
+	 rm ~/temp
+
+
+ else
+	 notify-send "📢 Hola cabronzito" "A magia não vai acontecer 📵"
+fi

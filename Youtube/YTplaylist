@@ -1,0 +1,29 @@
+#!/bin/zsh
+# hectorhernandez.xyz
+
+# Link de descarga
+link=$(xclip -o)
+
+# Metadata
+autor=$(echo "" | dmenu -p "¿Quien es el autor? " -i -l 1 )
+album=$(echo "" | dmenu -p "¿Qué album es?" -i -l 1 )
+
+# Crea un directorio con el nombre del album en la carpeta musica
+mkdir -p "Music/$album"
+cd "Music/$album"
+
+#
+youtube-dl --yes-playlist -f bestaudio -o '%(playlist_index)s#%(title)s.%(ext)s' --recode-video ogg $link
+
+for i in *.ogg
+do
+	numero=$(echo $i | cut -d "#" -f 1)
+	nombre=$(echo $i | sed "s/\s/@/g")
+	final=$(echo $i | cut -d "#" -f 2)
+
+	mv $i $nombre
+
+	ffmpeg -i "$nombre" -metadata artist=$autor -metadata album=$album -metadata track=$numero $final
+	mv $final $(echo $final | sed "s/@/_/g")
+	rm $nombre
+done

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+busqueda=$(echo -e "Español\nEnglish\nPortuguês" | dmenu -p "¿Qué quieres buscar? " -i -l 5)
+case $busqueda in
+	Español)
+		echo español > $HOME/.local/share/Diccionarios/Idioma.txt;;
+	English)
+		echo english > $HOME/.local/share/Diccionarios/Idioma.txt;;
+	Português)
+		echo português > $HOME/.local/share/Diccionarios/Idioma.txt;;
+esac

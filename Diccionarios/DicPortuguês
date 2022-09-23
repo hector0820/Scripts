@@ -1,0 +1,16 @@
+#!/bin/bash
+
+palabra=$(ls ~/.local/share/Diccionarios/Portugues | dmenu -p "¿Qué palabra buscas? " -i -l 10)
+dir="$HOME/.local/share/Diccionarios/Portugues/$palabra"
+
+if [ -f "$dir" ]
+then
+	notify-send "Definición Diccio de $palabra" "$(cat $HOME/.local/share/Diccionarios/Portugues/$palabra)"
+else
+	ip=$(cat .local/share/IP/ip)
+	wget -q --user-agent=$ip -O $palabra https://www.dicio.com.br/$palabra/
+	definicion=$(grep "meta property=\"og:description" $palabra | sed -e "s/.*=\"//" -e "s/.*Online de Português\.\s*//" -e "s/\">$//")
+	notify-send "Definición Diccio de «$palabra»" "$definicion"
+	echo "$definicion" > $HOME/.local/share/Diccionarios/Portugues/$palabra
+	rm $palabra
+fi

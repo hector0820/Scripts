@@ -1,0 +1,16 @@
+#!/bin/bash
+# hectorhernandez.xyz
+
+busqueda=$(echo -e "Google\nYoutube\nDiccionarios\nTorrents\nVariables" | dmenu -p "¿Qué quieres buscar? " -i -l 5)
+case $busqueda in
+	Google)
+		busquedasGO;;
+	Youtube)
+		busquedasYT;;
+	Diccionarios)
+		Diccionarios;;
+	Torrents)
+		transmission-remote -a $(xclip -o);;
+	Variables)
+		DictLang;;
+esac

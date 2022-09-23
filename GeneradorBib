@@ -1,0 +1,11 @@
+#!/bin/bash
+# hectorhernandez.xyz
+
+[ -f  ~/Documents/Bibliografia.bib ] && rm ~/Documents/Bibliografia.bib
+tree -i -f Documents/Obsidian/📚\ Bibliografia/ | sed -n "/\.md$/p" > GeneradorBib.txt
+
+while read -r line; do
+	sed -n "/^\`\`\`/,/^\`/p" "${line}" >> ~/Documents/Bibliografia\ Obsidian.bib
+done < GeneradorBib.txt
+
+sed -i '/^`/d' ~/Documents/Bibliografia\ Obsidian.bib

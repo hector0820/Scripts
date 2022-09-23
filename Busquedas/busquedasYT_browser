@@ -1,0 +1,14 @@
+#!/bin/bash
+# hectorhernandez.xyz
+
+dir=".local/share/busquedas/historial"
+busqueda=$(cat $dir | dmenu -p "¿Qué quieres buscar? " -i -l 5)
+
+if [ "$busqueda" != "Ya nada, muchas gracias" ]
+then
+	final=$(echo $busqueda | sed -e "s/\s/+/g" -e "s/,//g" -e "s/\.//g")
+	brave "https://www.youtube.com/results?search_query=$final"
+	[ -z $(grep -m 1 "$busqueda" $dir) ] && echo $busqueda >> $dir
+else
+	notify-send "Entiedo, está bien" "Ya después busco lo que necesites"
+fi
