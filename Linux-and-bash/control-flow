@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+question="si"
+fruits=(apple banana pear pinaple)
+
+while [ "$question" == "si" ];
+do
+    echo ${fruits[@]}
+    for fruit in ${fruits[@]};
+    do echo "I love eating healthy snacks like this $fruit";done
+    read -p "¿quieres continuar? " question \
+        && [ "$question" == "si" ] \
+        && read -p "Dime una fruta " fruta \
+        && fruits+=($fruta) \
+        || break
+done
