@@ -9,7 +9,7 @@ then
 else
 	ip=$(cat ~/.local/share/IP/ip)
 	wget -q --user-agent=$ip -O word.txt https://www.collinsdictionary.com/dictionary/english/$palabra
-	definicion="$(python3 -c "import pprint; from extruct.jsonld import JsonLdExtractor; import json; pp = pprint.PrettyPrinter(indent=2); archivo = open('word.txt'); html = archivo.read(); jslde = JsonLdExtractor(); data = jslde.extract(html); print(data[0]['hasDefinedTerm'][0]['description']);")"
+	definicion="$(python -c "import pprint; from extruct.jsonld import JsonLdExtractor; import json; pp = pprint.PrettyPrinter(indent=2); archivo = open('word.txt'); html = archivo.read(); jslde = JsonLdExtractor(); data = jslde.extract(html); print(data[0]['hasDefinedTerm'][0]['description']);")"
 	echo $definicion > $dir
 	rm word.txt
 	notify-send "Definición del Collins Dictionary de «$palabra»" "$(cat ~/.local/share/Diccionarios/English/$palabra)"

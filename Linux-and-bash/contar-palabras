@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+file=$1
+cat $file | tr " " "\n" | sort | uniq -c | sort -gr | head -10

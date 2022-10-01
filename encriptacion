@@ -1,0 +1,11 @@
+#!/bin/bash
+
+FILENAME="$(date "+%Y%m%d").tar.gz"
+
+cd /home/hector/Documents
+tar cf - "Obsidian" | gzip -9 - > ~/${FILENAME}
+cd $HOME
+gpg --output ".Respaldos/Obsidian/${FILENAME}.gpg" --encrypt --recipient hector.hdez.08@gmail.com ${FILENAME}
+rm "${FILENAME}"
+cd /home/hector/Documents/Scripts/Python
+python GoogleDrive.py
