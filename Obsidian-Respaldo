@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -e
+Dia=$(date "+%Y-%m-%d")
+Logs=".Respaldos/logs.txt"
+Respaldos=".Respaldos/Obsidian"
+MountPoint="/Documents/Cloud/Gdrive"
+
+ObsiDianBackUp(){
+	mail=$(gpg --list-keys | grep "ultimate" | cut -d"<" -f2 | sed "s/.$//")
+	tar cf - "Documents/Obsidian" | gzip -9 - > "$Respaldos/${Dia}.tar.gz"
+	gpg --output "$Respaldos/$Dia.tar.gz.gpg" --encrypt --recipient $mail "$Respaldos/${Dia}.tar.gz"
+	rm "$Respaldos/${Dia}.tar.gz"
+}
+
+InternetConnection(){
+	if ping -q -c 5 www.google.com > /dev/null 2>&1
+	then
+		echo "HAY CONEXIÓN DE INTERNET"
+	else
+		echo "El respaldo del día $Dia no pudo ser realizado" >> "$Logs"
+		exit 1
+	fi
+}
+
+MountRclone(){
+	if [ $(ls ~/Documents/Cloud/Gdrive | wc -l) -gt 0 ]
+	then
+		echo "LA UNIDAD DE GOOGLE DRIVE ESTA YA MONTADA"
+	else
+		rclone mount Gdrive: "${MountPoint}" --daemon
+	fi
+}
+
+UploadingGdrive(){
+	rclone sync $1 Gdrive:Notas\ Obsidian -P
+ }
+
+InternetConnection
+MountRclone
+ObsiDianBackUp
+UploadingGdrive "$Respaldos/${Dia}.tar.gz.gpg"

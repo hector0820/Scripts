@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$(ls ~/Xiaomi)" ]
+if [ "$(ls ~/Documents/Telefono)" ]
 then
 	 notify-send "🌝 Hola hacker 🕵️‍♂️" "A magia vai acontecer 💾"
 
@@ -22,27 +22,27 @@ then
 
 
 	 # Videos
-	 for i in {webm,mp4}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
-
-	 while IFS= read -r line
-	 do
-		 [ -f "${line}" ] && cp -v "$line" ~/Telefono/Videos
-	 done < ~/temp
-
-	 rm ~/temp
-
-
-	 # Documentos
-	 for i in {pdf,epub,docx}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
-
-	 while IFS= read -r line
-	 do
-		 [ -f "${line}" ] && cp -v "$line" ~/Telefono/Pdf
-	 done < ~/temp
-
-	 rm ~/temp
-
-
+# 	 for i in {webm,mp4}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
+#
+# 	 while IFS= read -r line
+# 	 do
+# 		 [ -f "${line}" ] && cp -v "$line" ~/Telefono/Videos
+# 	 done < ~/temp
+#
+# 	 rm ~/temp
+#
+#
+# 	 # Documentos
+# 	 for i in {pdf,epub,docx}; do sed -n "/\.$i$/p" ~/lista.txt >> ~/temp; done
+#
+# 	 while IFS= read -r line
+# 	 do
+# 		 [ -f "${line}" ] && cp -v "$line" ~/Telefono/Pdf
+# 	 done < ~/temp
+#
+# 	 rm ~/temp
+#
+#
  else
 	 notify-send "📢 Hola cabronzito" "A magia não vai acontecer 📵"
 fi
