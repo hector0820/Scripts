@@ -4,13 +4,14 @@ set -e
 Dia=$(date "+%Y-%m-%d")
 Logs=".Respaldos/logs.txt"
 Respaldos=".Respaldos/Obsidian"
-MountPoint="/Documents/Cloud/Gdrive"
+MountPoint="Documents/Cloud/Gdrive"
 
 ObsiDianBackUp(){
 	mail=$(gpg --list-keys | grep "ultimate" | cut -d"<" -f2 | sed "s/.$//")
 	tar cf - "Documents/Obsidian" | gzip -9 - > "$Respaldos/${Dia}.tar.gz"
 	gpg --output "$Respaldos/$Dia.tar.gz.gpg" --encrypt --recipient $mail "$Respaldos/${Dia}.tar.gz"
 	rm "$Respaldos/${Dia}.tar.gz"
+	echo "SE A CREADO EL ARCHIVO Y ESTA LISTO PARA SUBIRSE A GOOGLE DRIVE"
 }
 
 InternetConnection(){
@@ -29,6 +30,7 @@ MountRclone(){
 		echo "LA UNIDAD DE GOOGLE DRIVE ESTA YA MONTADA"
 	else
 		rclone mount Gdrive: "${MountPoint}" --daemon
+		echo "LA UNIDAD DE GOOGLE DRIVE ESTA YA MONTADA"
 	fi
 }
 

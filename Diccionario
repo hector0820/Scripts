@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# You must set a a variable DICCIONARIO into your
+# .bashrc or .zprofile to set the dictory to save
+# the diccinaries files.
+
+[ -z $DICCIONARIO ] && notify-send "Please, define a DICCIONARIO varible to continue." && exit 1
+
+# Dmenu is required to use this script
+
+[[ -z $(whereis "dmenu" | cut -d":" -f 2)  ]] && notify-send "You need to install dmenu to use this dictionary." && exit 1
+
+
+# In case to change the language, use the flag -l or --lang
+# and choose it from from the list displayed by dmenu
+
+if [[ $1 == "-l" ]] || [[ $1 == "--lang" ]]
+then
+	IDIOMA=$(echo -e "Español\nEnglish\nPortuguês" | dmenu -p "Please, choose a language " -i -l 3)
+	echo "$IDIOMA" > $DICCIONARIO/lang
+else
+	IDIOMA=$(cat $DICCIONARIO/lang)
+fi
+
+# If you don't have you web IP, uncoment this function.
+# if you have a better way to know your ip, change it
+# and set it as "ip" variable.
+
+IP(){
+	if [[ -f $(cat $IP) ]]
+	then
+		mkdir -p $IP
+		wget -O ip.txt https://www.whatismypublicip.com/
+		ip=$(grep '<div id="up_finished" style="font-size: 30px;"' ip.txt | sed -e "s/\s//g" -e "s/<[^>]*>//g")
+		echo $ip > $IP
+		rm ip.txt
+	else
+		ip=$(cat $IP)
+	fi
+}
+
+IP
+
+Espanol(){
+	[[ -d "$DICCIONARIO/$IDIOMA" ]] || mkdir -p "$DICCIONARIO/$IDIOMA"
+	PALABRA="$(ls "$DICCIONARIO/$IDIOMA" | dmenu -p "¿Qué palabra buscas? " -i -l 10)"
+
+	if [[ -f $DICCIONARIO/$IDIOMA/$PALABRA ]]
+	then
+		ACTION=$(dunstify --action="forwardAction,Forward" "Definición RAE de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+	else
+		wget -q --user-agent=$ip -O $PALABRA https://dle.rae.es/$PALABRA
+		DEFINICION=$(grep 'name="description"' $PALABRA |  sed -e 's/^[^.*]*1//g' -e "s/^/1/" -e "s/\">//")
+		grep -e 'class="tit-significado' -e 'class="significado textonovo"' prueba.html | sed -e 's/<[^>]\+>//g' -e "s/^\s\+//" | sed -n 2p | sed -re 's/\w*/(&)/1' | sed "s/\./\n/"
+		echo "$DEFINICION" > $DICCIONARIO/$IDIOMA/$PALABRA
+		ACTION=$(dunstify --action="forwardAction,Forward" "Definición RAE de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+
+	fi
+
+	[[ $ACTION == "forwardAction" ]] && $TERMINAL -e less $DICCIONARIO/$IDIOMA/$PALABRA
+	[ -f $PALABRA ] && rm $PALABRA
+}
+
+Portugues(){
+	[[ -d "$DICCIONARIO/$IDIOMA" ]] || mkdir -p "$DICCIONARIO/$IDIOMA"
+	PALABRA="$(ls "$DICCIONARIO/$IDIOMA" | dmenu -p "O qué palavra pesquisas? " -i -l 10)"
+
+	if [[ -f $DICCIONARIO/$IDIOMA/$PALABRA ]]
+	then
+		ACTION=$(dunstify --action="forwardAction,Forward" "Significado de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+	else
+		wget -q --user-agent=$ip -O $PALABRA https://www.dicio.com.br/$PALABRA
+		DEFINICION=$(grep -e 'class="tit-significado' -e 'class="significado textonovo"' $PALABRA | sed -e 's/<[^>]\+>//g' -e "s/^\s\+//" | sed -n 2p | sed -re 's/\w*/(&)/1' | sed "s/\./\n/")
+		echo "$DEFINICION" > $DICCIONARIO/$IDIOMA/$PALABRA
+		ACTION=$(dunstify --action="forwardAction,Forward" "Significado de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+	fi
+
+	[[ $ACTION == "forwardAction" ]] && $TERMINAL -e less $DICCIONARIO/$IDIOMA/$PALABRA
+	[ -f $PALABRA ] && rm $PALABRA
+}
+
+English(){
+	[[ -d "$DICCIONARIO/$IDIOMA" ]] || mkdir -p "$DICCIONARIO/$IDIOMA"
+	PALABRA="$(ls "$DICCIONARIO/$IDIOMA" | dmenu -p "Which word are you looking for? " -i -l 10)"
+
+	if [[ -f $DICCIONARIO/$IDIOMA/$PALABRA ]]
+	then
+		ACTION=$(dunstify --action="forwardAction,Forward" "Definición del Collins Dictionary de «$palabra»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+	else
+		wget -q --user-agent=$ip -O word.txt https://www.collinsdictionary.com/dictionary/english/$PALABRA
+		DEFINICION="$(python -c "import pprint; from extruct.jsonld import JsonLdExtractor; import json; pp = pprint.PrettyPrinter(indent=2); archivo = open('word.txt'); html = archivo.read(); jslde = JsonLdExtractor(); data = jslde.extract(html); print(data[0]['hasDefinedTerm'][0]['description']);")"
+		echo "$DEFINICION" > $DICCIONARIO/$IDIOMA/$PALABRA
+		rm word.txt
+		ACTION=$(dunstify --action="forwardAction,Forward" "Meaning of «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+	fi
+
+	[[ $ACTION == "forwardAction" ]] && $TERMINAL -e less $DICCIONARIO/$IDIOMA/$PALABRA
+
+}
+
+
+
+case $IDIOMA in
+	Español)
+		Espanol;;
+	English)
+		English;;
+	Português)
+		Portugues;;
+esac
