@@ -10,9 +10,11 @@
 
 [[ -z $(whereis "dmenu" | cut -d":" -f 2)  ]] && notify-send "You need to install dmenu to use this dictionary." && exit 1
 
-
 # In case to change the language, use the flag -l or --lang
 # and choose it from from the list displayed by dmenu
+
+#IDIOMA=$(cat hola.txt 2&>/dev/null)
+#[ -z $IDIOMA ] && notify-send "Please, define a language using the -l or --lang flag." && exit 1
 
 if [[ $1 == "-l" ]] || [[ $1 == "--lang" ]]
 then
@@ -26,20 +28,7 @@ fi
 # if you have a better way to know your ip, change it
 # and set it as "ip" variable.
 
-IP(){
-	if [[ -f $(cat $IP) ]]
-	then
-		mkdir -p $IP
-		wget -O ip.txt https://www.whatismypublicip.com/
-		ip=$(grep '<div id="up_finished" style="font-size: 30px;"' ip.txt | sed -e "s/\s//g" -e "s/<[^>]*>//g")
-		echo $ip > $IP
-		rm ip.txt
-	else
-		ip=$(cat $IP)
-	fi
-}
-
-IP
+IP=$(wget -q -O - ipinfo.io/ip)
 
 Espanol(){
 	[[ -d "$DICCIONARIO/$IDIOMA" ]] || mkdir -p "$DICCIONARIO/$IDIOMA"
@@ -49,9 +38,9 @@ Espanol(){
 	then
 		ACTION=$(dunstify --action="forwardAction,Forward" "Definición RAE de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
 	else
-		wget -q --user-agent=$ip -O $PALABRA https://dle.rae.es/$PALABRA
+		wget -q --user-agent=$IP -O $PALABRA https://dle.rae.es/$PALABRA
 		DEFINICION=$(grep 'name="description"' $PALABRA |  sed -e 's/^[^.*]*1//g' -e "s/^/1/" -e "s/\">//")
-		grep -e 'class="tit-significado' -e 'class="significado textonovo"' prueba.html | sed -e 's/<[^>]\+>//g' -e "s/^\s\+//" | sed -n 2p | sed -re 's/\w*/(&)/1' | sed "s/\./\n/"
+		#grep -e 'class="tit-significado' -e 'class="significado textonovo"' prueba.html | sed -e 's/<[^>]\+>//g' -e "s/^\s\+//" | sed -n 2p | sed -re 's/\w*/(&)/1' | sed "s/\./\n/"
 		echo "$DEFINICION" > $DICCIONARIO/$IDIOMA/$PALABRA
 		ACTION=$(dunstify --action="forwardAction,Forward" "Definición RAE de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
 
@@ -69,7 +58,7 @@ Portugues(){
 	then
 		ACTION=$(dunstify --action="forwardAction,Forward" "Significado de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
 	else
-		wget -q --user-agent=$ip -O $PALABRA https://www.dicio.com.br/$PALABRA
+		wget -q --user-agent=$IP -O $PALABRA https://www.dicio.com.br/$PALABRA
 		DEFINICION=$(grep -e 'class="tit-significado' -e 'class="significado textonovo"' $PALABRA | sed -e 's/<[^>]\+>//g' -e "s/^\s\+//" | sed -n 2p | sed -re 's/\w*/(&)/1' | sed "s/\./\n/")
 		echo "$DEFINICION" > $DICCIONARIO/$IDIOMA/$PALABRA
 		ACTION=$(dunstify --action="forwardAction,Forward" "Significado de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
@@ -85,13 +74,13 @@ English(){
 
 	if [[ -f $DICCIONARIO/$IDIOMA/$PALABRA ]]
 	then
-		ACTION=$(dunstify --action="forwardAction,Forward" "Definición del Collins Dictionary de «$palabra»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+		ACTION=$(dunstify --action="forwardAction,Forward" "Definición del Collins Dictionary de «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
 	else
-		wget -q --user-agent=$ip -O word.txt https://www.collinsdictionary.com/dictionary/english/$PALABRA
-		DEFINICION="$(python -c "import pprint; from extruct.jsonld import JsonLdExtractor; import json; pp = pprint.PrettyPrinter(indent=2); archivo = open('word.txt'); html = archivo.read(); jslde = JsonLdExtractor(); data = jslde.extract(html); print(data[0]['hasDefinedTerm'][0]['description']);")"
+		wget -q --user-agent=$IP -O $PALABRA https://www.collinsdictionary.com/dictionary/english/$PALABRA
+		DEFINICION=`sed -n '/div class="def"/p' $PALABRA | sed -e 's/<[^>]*>//g' -e 's/^\s\+//' | sed '/&nbsp;/d' | sed "s/\b\(.\)/\u\1/g"`
+		rm $PALABRA
 		echo "$DEFINICION" > $DICCIONARIO/$IDIOMA/$PALABRA
-		rm word.txt
-		ACTION=$(dunstify --action="forwardAction,Forward" "Meaning of «$PALABRA»" "$(cat $DICCIONARIO/$IDIOMA/$PALABRA)")
+		ACTION=$(dunstify --action="forwardAction,Forward" "Significado de «$PALABRA»" "$(head $DICCIONARIO/$IDIOMA/$PALABRA)")
 	fi
 
 	[[ $ACTION == "forwardAction" ]] && $TERMINAL -e less $DICCIONARIO/$IDIOMA/$PALABRA
