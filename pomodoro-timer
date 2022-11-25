@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Crea a directory to put the timer
+[ -d ~/.local/share/pomodoro ] || mkdir -p ~/.local/share/pomodoro
+
+# Choose the minutes of the session
+TIME=$(echo -e "10\n15\n20\n25\n30" | dmenu -p "Please, the minutes of study" -i -l 5)
+TIMER=$(( $TIME * 60 ))
+
+notify-send "Comienza la sesión" "La sesión de $TIME minutos comienza ahora"
+
+# Create a file and put the time of the session
+i=0
+while [ $i -lt $TIMER ]
+do
+	SEGUNDOS=$(( $i % 60 ))
+	MINUTOS_S=$(( $i - $SEGUNDOS))
+	MINUTOS=$(( $MINUTOS_S / 60 ))
+
+	if [ $MINUTOS -gt 0 ]
+	then
+		echo "⏱ $MINUTOS M" > ~/.local/share/pomodoro/time
+	fi
+        i=$(( $i + 1 ))
+        sleep 1
+done
+
+# Delete the time file and set o notification
+rm -r ~/.local/share/pomodoro/time
+notify-send "los $TIME minutos de estudio han finalizado"
