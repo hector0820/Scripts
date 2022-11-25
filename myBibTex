@@ -1,5 +1,6 @@
 #!/bin/bash
-# hectorhernandez.xyz
+# Creates a file that contains all books in my obsidian's
+# book directory.
 
 [ -f  ~/Documents/Bibliografia.bib ] && rm ~/Documents/Bibliografia.bib
 tree -i -f Documents/Obsidian/📚\ Bibliografia/ | sed -n "/\.md$/p" > GeneradorBib.txt

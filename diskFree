@@ -1,0 +1,5 @@
+#!/bin/bash
+# To know the free space in the sda3 partion.
+
+usado=`df -h /dev/sda3 | awk '{print $5}' | sed -n 2p`
+echo "💾${usado}"

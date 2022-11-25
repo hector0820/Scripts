@@ -1,13 +1,13 @@
 #!/bin/bash
 # Touchpad on - off
 
-touch=$(xinput list-props 11 | sed -n "2p" | sed -e "s/\s//g" -e "s/^.*://")
+touch=$(xinput list-props 12 | sed -n "2p" | sed -e "s/\s//g" -e "s/^.*://")
 
 if [ 1 == "$touch" ]
 then
-	xinput disable 11
+	xinput disable 12
 	notify-send "💻 Información del Touchpad 🖱️" "El touchpad es a desactivado 🪤"
 else
-	xinput enable 11
+	xinput enable 12
 	notify-send "💻 Información del Touchpad 🖱️" E"l touchpad esta activado 🖲️"
 fi

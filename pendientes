@@ -1,0 +1,31 @@
+#!/bin/bash
+# A simple script for add md format's to do list into my obsidian vault
+
+ACCION=$(echo -e "Agregar\nFinalizar\nEliminar" | dmenu -p "Please, choose a language " -i -l 3)
+ARCHIVO="$OBSIDIAN/Pendientes.md"
+
+AGREGAR(){
+	ACTIVIDAD=$(echo -e "Llamar a \nComprar \nIr a \nEstudiar sobre \nBuscar en internet " | dmenu -p "Teclea la actividad pendiente a realizar" -i -l 5)
+	echo "- [ ] $ACTIVIDAD" >> $ARCHIVO
+}
+
+FINALIZAR(){
+	FINALIZADA=$(sed -n '/- \[ \]/p' $ARCHIVO | sed -e 's/- \[ \]\s//' -e "s/^\s+//" | dmenu -p "¿Cual actividad has finalizado?" -i -l 10)
+	LINE_NUMBER=$(grep -n "$FINALIZADA" "$ARCHIVO" | cut -d":" -f1)
+	sed -i "${LINE_NUMBER}s/\[ \]/[X]/" $ARCHIVO
+}
+
+ELIMINAR(){
+	ELIMINADA=$(sed -n '/- \[ \]/p' $ARCHIVO | sed 's/- \[ \]\s//' | dmenu -p "¿Cual actividad has finalizado?" -i -l 10)
+	LINE_NUMBER=$(grep -n "$ELIMINADA" "$ARCHIVO" | cut -d":" -f1)
+	sed -i "${LINE_NUMBER}d" $ARCHIVO
+}
+
+case $ACCION in
+	Agregar)
+		AGREGAR;;
+	Finalizar)
+		FINALIZAR;;
+	Eliminar)
+		ELIMINAR;;
+esac
