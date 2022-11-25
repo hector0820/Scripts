@@ -1,5 +1,8 @@
 #!/bin/bash
+# Touchpad on - off
+
 touch=$(xinput list-props 11 | sed -n "2p" | sed -e "s/\s//g" -e "s/^.*://")
+
 if [ 1 == "$touch" ]
 then
 	xinput disable 11
