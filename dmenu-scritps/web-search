@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Set a web-search dir to save our historial searching
+DIR="${XDG_DATA_HOME}/web-search"
+[ -d $DIR ] || mkdir $DIR
+
+# Historial web-search
+FILE="$DIR/web-search.txt"
+[ -f $FILE ] || touch $FILE
+
+#
+SEARCH=$(cat "${FILE}" | dmenu -p "¿Qué quieres buscar? " -i -l 5)
+[ -z "${SEARCH}" ] && notify-send "No hay nada que buscar" "No escribiste nada, por tanto, no hay nada que buscar" && exit 1
+
+# Looking with the current browser and save the search in the history file
+$BROWSER "https://search.brave.com/search?q=${SEARC}"
+
+# Search if the search exist, if not, put it into the history file
+EXIST=$(grep -n "${SEARCH}" "${FILE}" | cut -d":" -f1)
+[[ ${EXIST} -gt 0 ]] || echo "${SEARHC}" >> "${FILE}"

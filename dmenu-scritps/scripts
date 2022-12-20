@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script allow to call another scripts that I made.
+
+busqueda=$(echo -e "Web search\nPendientes\nTorrents" | dmenu -p "¿Qué quieres hacer? " -i -l 5)
+case $busqueda in
+	Web\ search)
+		web-search;;
+	Pendientes)
+		pendientes;;
+	Torrents)
+		transmission-remote -a $(xclip -o)
+		notify-send "El archivo ha sido añadido" "En breve, comenzará la descarga.";;
+esac
